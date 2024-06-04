@@ -1,0 +1,20 @@
+from kivy.app import App
+from kivy.uix.screenmanager import ScreenManager, Screen
+from LoginScreen import LoginScreen
+from GameScreen import GameScreen
+from CameraScreen import CameraScreen
+from ExerciseScreen import ExerciseScreen
+from GoalsScreen import GoalsScreen
+
+class BuddyEatApp(App):
+    def build(self):
+        sm = ScreenManager()
+        sm.addwidget(LoginScreen(name='LoginScreen'))
+        sm.addwidget(GameScreen(name='GameScreen'))
+        sm.addwidget(CameraScreen(name='CameraScreen'))
+        sm.addwidget(ExerciseScreen(name='ExerciseScreen'))
+        sm.add_widget(GoalsScreen(name='GoalsScreen'))
+        return sm
+
+if name == "main":
+    BuddyEatApp().run()
