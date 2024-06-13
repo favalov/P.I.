@@ -4,10 +4,10 @@ from kivy.uix.button import Button
 from kivy.uix.label import Label
 
 class ExerciseScreen(Screen):
-    def init(self, kwargs):
-        super(ExerciseScreen, self).init(kwargs)
+    def __init__(self, **kwargs):
+        super(ExerciseScreen, self).__init__(**kwargs)
         layout = BoxLayout(orientation='vertical', padding=10, spacing=10)
-
+        
         label = Label(text="Exercícios Físicos Diários", font_size=40, size_hint=(1, 0.2))
         layout.add_widget(label)
 
@@ -24,10 +24,9 @@ class ExerciseScreen(Screen):
     def start_exercise(self, instance):
         print("Iniciando exercício...")
 
-        # Após completar o exercício, atualize os status
         game_screen = self.manager.get_screen('GameScreen')
         game_screen.update_bars_from_exercise()
-       
+
         self.manager.transition = SlideTransition(direction='right')
         self.manager.current = 'GameScreen'
 
