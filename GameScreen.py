@@ -8,7 +8,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.clock import Clock
 from kivy.core.text import LabelBase
 from kivy.graphics import Color, Rectangle
-from datetime import datetime, timedelta
+from datetime import datetime
 import json
 import os
 
@@ -22,7 +22,7 @@ class GameScreen(Screen):
         background = Image(source='imagens/FundoC.png', allow_stretch=True, keep_ratio=False, size_hint=(1, 1))
         layout.add_widget(background)
 
-        self.pet_image = Image(source='imagens/normal.png', size_hint=(None, None), size=(200, 200), pos_hint={'center_x': 0.4, 'center_y': 0.45})
+        self.pet_image = Image(source='imagens/normal.png', size_hint=(None, None), size=(200, 200), pos_hint={'center_x': 0.4, 'center_y': 0.4})
         layout.add_widget(self.pet_image)
 
         status_block = BoxLayout(orientation='vertical', size_hint=(1, None), height=200, pos_hint={'center_x': 0.5, 'y': 0})
@@ -43,10 +43,11 @@ class GameScreen(Screen):
 
         for label_text, bar in self.status_bars.items():
             bar_layout = BoxLayout(orientation='horizontal', size_hint_y=None, height=40)
-            label = Label(text=label_text, size_hint=(0.3, None), height=40, font_name='Monospace')
+            label = Label(text=label_text, font_size=20, size_hint=(0.3, None), height=40, font_name='Monospace')
             value_label = Label(text=f"{int(bar.value)}%", size_hint=(0.2, None), height=40, font_name='Monospace')
             self.value_labels[bar] = value_label
             bar.bind(value=self.update_value_label)
+            bar.bind(value=self.update_pet_image)
             bar_layout.add_widget(label)
             bar_layout.add_widget(bar)
             bar_layout.add_widget(value_label)
@@ -61,6 +62,10 @@ class GameScreen(Screen):
         goals_button = Button(background_normal='imagens/metas.png', size_hint=(None, None), size=(80, 80), pos_hint={'x': 0, 'top': 1})
         goals_button.bind(on_press=self.open_goals_screen)
         layout.add_widget(goals_button)
+
+        max_status_button = Button(text="Max Status", size_hint=(None, None), size=(120, 50), pos_hint={'center_x': 0.5, 'y': 0.85})
+        max_status_button.bind(on_press=self.set_max_status)
+        layout.add_widget(max_status_button)
 
         self.add_widget(layout)
 
@@ -139,12 +144,19 @@ class GameScreen(Screen):
 
     def update_pet_image(self, *args):
         avg_status = sum(bar.value for bar in self.status_bars.values()) / len(self.status_bars)
+        print(f"Average status: {avg_status}")
         if avg_status < 30:
             self.pet_image.source = 'imagens/triste.png'
         elif 30 <= avg_status <= 70:
             self.pet_image.source = 'imagens/normal.png'
         else:
             self.pet_image.source = 'imagens/feliz.png'
+
+    def set_max_status(self, instance):
+        print("Setting all status bars to 100%")
+        for bar in self.status_bars.values():
+            bar.value = 100
+        self.update_pet_image()
 
     def save_state(self, dt=None):
         state = {
@@ -159,7 +171,9 @@ class GameScreen(Screen):
         if os.path.exists("game_state.json"):
             with open("game_state.json", "r") as f:
                 state = json.load(f)
+                print("Loaded state:", state)
                 if "status_bars" in state:
                     for key, value in state["status_bars"].items():
+                        print(f"Loading status bar: {key} with value {value}")
                         self.status_bars[key].value = value
                 self.exercise_distance = state.get("exercise_distance", 0)
