@@ -1,5 +1,3 @@
-# GameScreen.py
-
 from kivy.uix.screenmanager import Screen, SlideTransition
 from kivy.uix.image import Image
 from kivy.uix.button import Button
@@ -14,7 +12,6 @@ from datetime import datetime, timedelta
 import json
 import os
 
-# Registre a fonte monoespace
 LabelBase.register(name='Monospace', fn_regular='fonts/monospace.ttf')
 
 class GameScreen(Screen):
@@ -22,18 +19,15 @@ class GameScreen(Screen):
         super(GameScreen, self).__init__(**kwargs)
         layout = FloatLayout()
 
-        # Fundo
         background = Image(source='imagens/FundoC.png', allow_stretch=True, keep_ratio=False, size_hint=(1, 1))
         layout.add_widget(background)
 
-        # Dinossauro
         self.pet_image = Image(source='imagens/normal.png', size_hint=(None, None), size=(200, 200), pos_hint={'center_x': 0.4, 'center_y': 0.45})
         layout.add_widget(self.pet_image)
 
-        # Bloco das barras de status
         status_block = BoxLayout(orientation='vertical', size_hint=(1, None), height=200, pos_hint={'center_x': 0.5, 'y': 0})
         with status_block.canvas.before:
-            Color(0.2, 0.6, 0.8, 1)  # Cor sólida para o fundo do bloco
+            Color(0.2, 0.6, 0.8, 1)
             self.status_block_rect = Rectangle(size=status_block.size, pos=status_block.pos)
             status_block.bind(size=self._update_status_block_rect, pos=self._update_status_block_rect)
 
@@ -60,25 +54,19 @@ class GameScreen(Screen):
 
         layout.add_widget(status_block)
 
-        # Botão da câmera no canto superior direito
         camera_button = Button(background_normal='imagens/camera.png', size_hint=(None, None), size=(80, 80), pos_hint={'right': 1, 'top': 1})
         camera_button.bind(on_press=self.open_camera)
         layout.add_widget(camera_button)
 
-        # Botão das metas diárias no canto superior esquerdo
         goals_button = Button(background_normal='imagens/metas.png', size_hint=(None, None), size=(80, 80), pos_hint={'x': 0, 'top': 1})
         goals_button.bind(on_press=self.open_goals_screen)
         layout.add_widget(goals_button)
 
         self.add_widget(layout)
 
-        # Inicializar timer para diminuir status
-        Clock.schedule_interval(self.decrease_status, 60)  # Diminuir status a cada 60 segundos
-
-        # Carregar estado do jogo
+        Clock.schedule_interval(self.decrease_status, 60)
         self.load_state()
 
-        # Agendar salvamento do estado do jogo a cada 5 minutos
         Clock.schedule_interval(self.save_state, 300)
 
     def _update_status_block_rect(self, instance, value):
@@ -100,7 +88,7 @@ class GameScreen(Screen):
         print("Decreasing status bars...")
         for bar in self.status_bars.values():
             initial_value = bar.value
-            bar.value = max(0, bar.value - 5)  # Reduzir o valor da barra em 5 a cada 60 segundos
+            bar.value = max(0, bar.value - 5)
             print(f"{bar}: {initial_value} -> {bar.value}")
 
         self.save_state()
@@ -116,18 +104,16 @@ class GameScreen(Screen):
             'doce': {'Alimentacao saudavel': -5, 'Forca': -5, 'Resistencia': -5, 'Energia': 10, 'Felicidade': 10}
         }
 
-        print("Updating status with food labels:", food_labels)  # Adicionando log para verificar os rótulos de alimentos recebidos
-        # Atualiza os status com base em cada rótulo de alimento identificado, contando apenas uma vez por imagem
+        print("Updating status with food labels:", food_labels)
         updated_labels = set()
         for food in food_labels:
             if food in food_effects and food not in updated_labels:
                 effects = food_effects[food]
                 for status, change in effects.items():
                     self.status_bars[status].value = max(0, min(100, self.status_bars[status].value + change))
-                    print(f"Updated {status} by {change} points")  # Adicionando log para verificar atualizações dos status
+                    print(f"Updated {status} by {change} points")
                 updated_labels.add(food)
 
-        # Atualiza a meta "Comer uma fruta" se uma fruta foi identificada
         if 'fruta' in updated_labels:
             goals_screen = self.manager.get_screen('GoalsScreen')
             goals_screen.complete_goal("Comer uma fruta")(None, None)
