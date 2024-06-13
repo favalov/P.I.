@@ -9,12 +9,12 @@ from GoalsScreen import GoalsScreen
 class BuddyEatApp(App):
     def build(self):
         sm = ScreenManager()
-        sm.addwidget(LoginScreen(name='LoginScreen'))
-        sm.addwidget(GameScreen(name='GameScreen'))
-        sm.addwidget(CameraScreen(name='CameraScreen'))
-        sm.addwidget(ExerciseScreen(name='ExerciseScreen'))
+        sm.add_widget(LoginScreen(name='LoginScreen'))
+        sm.add_widget(GameScreen(name='GameScreen'))
+        sm.add_widget(CameraScreen(name='CameraScreen'))
+        sm.add_widget(ExerciseScreen(name='ExerciseScreen'))
         sm.add_widget(GoalsScreen(name='GoalsScreen'))
         return sm
 
-if name == "main":
+if __name__ == "__main__":
     BuddyEatApp().run()
